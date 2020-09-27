@@ -1,0 +1,79 @@
+- hosts: rpi-jekyll
+  become: False
+  become_method: sudo
+  gather_facts: False
+
+  vars:
+    jekyll_user: rhempel
+
+  roles:
+# - linux.update_packages
+
+  tasks:
+  - name: Just let the world know this kind of works
+    block:
+    - command: echo "Hello World from {{ jekyll_user }} on {{ inventory_hostname }}"
+
+  - name: Install packages needed for Jekyll
+    become: True
+    apt:
+      pkg:
+      - git
+      - ruby-full
+      - build-essential
+      - zlib1g-dev
+
+  - name: Install bundler gem
+    become: True
+    gem:
+      name: bundler
+      state: present
+
+  - name: Install jekyll gem
+    become: True
+    gem:
+      name: jekyll
+      state: present
+
+  - name: Create directory for Jekyll projects
+    file:
+      path: '/home/{{ jekyll_user }}/Projects/jekyll'
+      state: directory
+      mode: '0755'
+
+  - name: Open Port 4000 for jekyll web server
+    become: True
+    iptables:
+      chain: INPUT
+      protocol: tcp
+      destination_port: 4000
+      jump: ACCEPT
+      action: insert
+
+    #- name: Check if port 4000 is already open
+    #
+    #    <S-Insert>
+    #- name: Get network names status
+    #      shell: "raspi-config nonint get_net_names"
+    #   register: pi_netnames
+    #  changed_when: False
+
+
+    #  - name: Open port 4000 for jekyll web server
+    #  become: True
+    #  shell: "iptables -I INPUT -p tcp --dport 4000 -j ACCEPT"
+    #  shell: "iptables -I INPUT -p tcp --dport 4000 -j ACCEPT"
+# -A INPUT -p tcp -m tcp --dport 4000 -j ACCEPT
+
+# - name: Clone Made Mistakes if it does not already exist in chempel
+#   git:
+#     repo: 'https://github.com/mmistakes/minimal-mistakes.git'
+#     dest: '/home/{{ jekyll_user }}/Projects/jekyll/chempel'
+#     update: no
+
+# - name: Set up new origin and upstream
+#   shell:
+#       chdir: "/home/{{ jekyll_user }}/Projects/jekyll/chempel"
+#       cmd:
+#       - "git remote rename origin upstream"
+#       - "git remote add origin git@github.com:rhempel/chempel.git"

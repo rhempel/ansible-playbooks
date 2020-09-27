@@ -1,0 +1,23 @@
+# Creates the user that will handle daily operations.
+---
+- name: Create admin user
+  user: name={{ admin_user }} shell=/bin/bash
+
+- name: Ensure admin user can log in with their key
+  authorized_key: user={{ admin_user }} key={{ admin_user_key }}
+  tags: update_admin_keys
+
+- name: Ensure admin user is a passwordless sudoer
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: '^{{ admin_user }}'
+    line: '{{ admin_user }} ALL=(ALL) NOPASSWD: ALL'
+    state: present
+    validate: 'visudo -cf %s'
+
+- name: Ensure admin user belongs to groups that pi normally belongs to
+  user:
+    name: "{{ admin_user }}"
+    groups: pi,adm,dialout,cdrom,sudo,audio,video,plugdev,games,users,input,netdev,gpio,i2c,spi
+    append: yes
+

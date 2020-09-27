@@ -1,0 +1,53 @@
+# rpi.configure_wifi - Enables wifi and sets up wpa_supplicant.conf
+---
+- name: Disabling WiFi
+  block:
+  - debug: 
+      msg: "Disabling wifi"
+    changed_when: False
+  - name: Remove wpa_supplicant.conf
+    become: yes
+    file:
+      path: /etc/wpa_supplicant/wpa_supplicant.conf
+      state: absent
+  - name: Blacklist the wifi driver
+    become: yes
+    template:
+      src: blacklist-wifi.conf.j2
+      dest: /etc/modprobe.d/blacklist-wifi.conf
+      backup: no
+    notify:
+    - Restart networking
+    - Restart dhcpd
+  when: (wifi == False)
+
+- name: Enabling Wifi
+  block:
+  - debug: 
+      msg: "wifi SSID {{ wifi_ssid }}"
+  - debug: 
+      msg: "wifi psk  {{ wifi_psk }}"
+  - name: Remove blacklist-wifi.conf
+    become: yes
+    file:
+      path: /etc/modprobe.d/blacklist-wifi.conf
+      state: absent
+  - name: Create wpa_supplicant
+    become: yes
+    template:
+      src: wpa_supplicant.conf.j2
+      dest: /etc/wpa_supplicant/wpa_supplicant.conf
+      backup: yes
+    notify:
+    - Restart networking
+    - Restart dhcpd
+  when: (wifi == True)
+  
+- name: Disable dhcpcd for {{ wifi_disable_dhcpcd_workaround_interface }}
+  blockinfile:
+    path: /etc/dhcpcd.conf
+    block: |
+      denyinterfaces {{ wifi_disable_dhcpcd_workaround_interface }}
+      nohook wpa_supplicant
+  notify: Restart dhcpcd
+  when: wifi_disable_dhcpcd_workaround

@@ -1,0 +1,25 @@
+all:
+  vars:
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ssh: False
+    wifi: False
+    wifi_disable_dhcpcd_workaround: True
+    poweroff: True 
+    hostname: some-default-hostname 
+
+#   LOCALE: "en_DK.UTF-8"
+#   TIMEZONE: "Europe/Copenhagen"
+#   XKBLAYOUT: "us"
+
+  hosts:
+    127.0.0.1
+  children:
+    fresh-raspberrypi:
+      hosts:
+        raspberrypi.local
+      vars:
+        ssh: True
+    rpi-ftf:
+      hosts:
+        tpi1.local
+

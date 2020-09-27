@@ -1,0 +1,14 @@
+all:
+  hosts:
+    127.0.0.1
+  children:
+    fresh-raspberrypi:
+      hosts:
+        raspberrypi.local
+    rpi-jekyll:
+      hosts:
+        zwischenwagen.local
+    rpi-develop:
+      hosts:
+        sandkasten.local
+

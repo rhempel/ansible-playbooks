@@ -1,25 +1,76 @@
-# ansible-playbooks
+# legotest-playbooks
 
-This is an attempt to get some order into the way I manage my small
-but growing army of embedded computers - mostly Raspberry Pi variants.
+The current method for managing the RaspberryPi based Firmware Test
+Framework (FTF) at LEGO is a Python script that runs on a PC or OSX
+machine. This works but requires too much installation on the local
+machine and requires re-learning how to do it every time.
+
+The new procedure uses RedHat Ansible running on a RaspberryPi to
+manage configuring and upating the FTF.
+
+Initially we will run Ansible from a Linux host machine, but the final
+version will provide instructions for doing a minimal manual setup
+to get a RaspberryPi set up to run Ansible, and look after itself and
+the FTF afterwards.
 
 The goal is to be able to grab the latest Raspbian image, burn it onto
 a card (using Etcher), and then easliy run a few playbooks to get the
-Pi configured to suit my needs. It's way easier than writing down a
-number of step by step instructions
+RaspberryPi configured and added to the test framework. As a bonus, the
+files we use to configure Ansible also provide documentation on the 
+FTF is configured.
 
 # First Steps
 
-Install Ansible on your host machine - later we will make this a 
-Raspberry Pi as well :-)
+Install Ansible on your Linux or OSX host machine - later we will make
+this a Raspberry Pi as well :-) Unfortunately Windows is NOT supported
+as an Ansible host machine.
 
-Now run the inital playbook that permanently enables ssh, configures
+Flash the latest Raspbian Buster Lite image to the SD card using
+Balena Etcher
+
+https://www.raspberrypi.org/downloads/raspbian/
+https://www.balena.io/etcher/
+
+By default, the RaspberryPi has ssh disabled, so when you have finished
+flashing the microSD card you will need to create a blank file 
+called 'ssh' on the card:
+
+```
+touch /media/yourusername/boot/ssh
+```
+
+For security, we will use wired networking and disable WiFi on our
+RaspberryPis in the FTF. So plug in an Ethernet cable and connect to
+your host machine.
+
+You may need to enable link-local networking on your local machine.
+
+ - we will add a section here on setting up the Ansible hosting RaspberryPi
+
+Now insert the card in the RaspberryPi and boot - you may need to wait
+a few minutes before the device is available.
+
+Check that you can reach the RaspberryPi on your wired network:
+
+```
+ping raspberrypi.local
+```
+
+Now run the inital playbook that permanently enables ssh, disables
 the local wifi, changes the hostname, and then powers down the rpi:
 
 ```
-ansible-playbook -v -i ./hosts -u pi -k fresh-rpi.yml --extra-vars '{"hostname":"some-new-hostname"}' 
+ansible-playbook -v -i ./legotest_hosts -u pi -k fresh-rpi.yml --extra-vars '{"hostname":"some-new-hostname"}' 
 ```
 
+You will be asked for the 'pi' user's SSH password for the
+RaspberryPi which is of course 'raspberry' - yes it's insecure
+but we're going to change that shortly!
+
+
+
+
+ 
 To create an ansible-vault encrypted variable, such as a password:
 
 mkpasswd --method=sha-512
@@ -75,11 +126,10 @@ In particular, we are following the "Fresh Start" section
 Create a blank Gemfile and put this inside:
 
 gem "minimal-mistakes-jekyll"
+gem "jekyll-include-cache"
 
-And create a blank "\_config.yml" and copy the default contents into it from
+And create a blank "_config.yml" and copy the default contents into it from
 the MinimalMistakes repo
-
-Now get things installed by running `bundle` once to get everything installed
 
 
 

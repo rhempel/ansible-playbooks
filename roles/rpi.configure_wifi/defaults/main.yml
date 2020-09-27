@@ -1,0 +1,10 @@
+---
+wifi_country: "DK"
+wifi_apt_cache_valid_time: 86400
+wifi_control_interface_access_group: netdev
+
+wifi_disable_dhcpcd_workaround: false
+wifi_disable_dhcpcd_workaround_interface: wlan0
+
+wifi_ssid: "TP-LINK_AEB0"
+wifi_psk: "8ab25986f81312413b2108e32e86d97115225276e114aec52e39113b360d0868"

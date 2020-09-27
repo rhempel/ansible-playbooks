@@ -1,0 +1,6 @@
+# rpi.poweroff - Powers off the pi if configured to do so
+---
+  - name: Poweroff if enabled
+    become: yes
+    shell: "shutdown -h +1"
+    when: (poweroff == True) 

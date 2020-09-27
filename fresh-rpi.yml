@@ -1,0 +1,22 @@
+- hosts: fresh-raspberrypi
+  remote_user: pi
+  become: True
+  become_method: sudo
+  gather_facts: True
+
+# The vars section here should be set to reasonable defaults in the
+# corresponding hosts file
+  vars:
+
+  roles:
+  - rpi.configure_ssh
+  - rpi.configure_wifi
+
+# NOTE: rpi.poweroff has a 1 minute delay to allow the
+#       hostname to be changed - sudo needs the contents
+#       of /etc/hostname and /etc/hosts to match the
+#       current hostname, which does not change until
+#       reboot 
+
+  - rpi.poweroff        
+  - rpi.configure_hostname

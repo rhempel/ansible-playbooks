@@ -1,0 +1,15 @@
+# rpi.configure_wifi - Handlers for wifi functions
+---
+- name: Restart dhcpd
+  become: yes
+  service:
+    name: dhcpcd
+    state: restarted
+  when: (poweroff == False)
+
+- name: Restart networking
+  become: yes
+  service:
+    name: networking
+    state: restarted
+  when: (poweroff == False)
