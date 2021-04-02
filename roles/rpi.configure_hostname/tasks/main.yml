@@ -1,7 +1,7 @@
 # rpi.configure_hostname - Sets the new hostname if specified
 ---
 - name: Get hostname
-  shell: "raspi-config nonint get_hostname"
+  shell: "hostnamectl --static status"
   register: pi_hostname
   changed_when: False
 
@@ -12,6 +12,6 @@
     - "New hostname: {{ hostname }}"
 
 - name: Change hostname
-  shell: "raspi-config nonint do_hostname {{ hostname }}"
+  shell: "hostnamectl --static set-hostname {{ hostname }}"
   when: (pi_hostname.stdout != hostname)
 

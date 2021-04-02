@@ -17,8 +17,6 @@ all:
     fresh-raspberrypi:
       hosts:
         raspberrypi.local
-      vars:
-        ssh: True
     rpi-ftf:
       hosts:
         tpi1.local
