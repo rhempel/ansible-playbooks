@@ -13,28 +13,88 @@ number of step by step instructions
 Install Ansible on your host machine - later we will make this a 
 Raspberry Pi as well :-)
 
-Now run the inital playbook that permanently enables ssh, configures
-the local wifi, changes the hostname, and then powers down the rpi:
+Be aware of the following things that can trip you up:
+
+- Ansible uses `ssh` under the hood to connect to the device you are
+  trying to configure. By default, each new Raspberry Pi will announce
+  itself as raspberrypi.local or it may be assigned a DHCP address
+  that has been used before.
+
+- If the device name or IP address has been used by `ssh` before, then
+  you will get an error from the ssh system like this:
 
 ```
-ansible-playbook -v -i ./hosts -u pi -k fresh-rpi.yml --extra-vars '{"hostname":"some-new-hostname"}' 
+WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that the RSA host key has just been changed.
+The fingerprint for the RSA key sent by the remote host is ...
 ```
+
+To get around this, remove the old `ssh` fingerprint like this:
+
+```
+ssh-keygen -R [hostname|address] 
+```
+
+And then `ssh` in manually one time, like this:
+
+```
+ssh pi@[hostname|address] 
+```
+
+Remember the default password is `raspberry` - we will change that soon
+enough.
+
+# Initial setup of the Raspberry Pi
+
+Now run the inital playbook that permanently enables ssh, configures
+the local wifi, changes the hostname, and then powers down or restarts
+the Raspberry Pi.
+
+```
+ansible-playbook -v -i [hostname|address], -k fresh-rpi.yml --extra-vars '{"hostname":"some-new-hostname"}' 
+```
+
+Note the comma following the `hostname` or `address` - this ensures that
+the address is not interpreted as a filename.
+
+Once this is completed, we can move on to adding our private ssh keys
+and making the system more secure by changing the default password for
+the `pi` user.
+
+# Using Encrypted Variables
+
+We want to share our scripts, but not our secrets! Ansible makes this
+relatively easy with a feature called the vault. You use the vault to securely
+store anything that you need to run your scripts. That might include passwords,
+server names, file paths, etc.
 
 To create an ansible-vault encrypted variable, such as a password:
 
+```
 mkpasswd --method=sha-512
 
 ansible-vault encrypt_string '$6$t5eSXI8UxtBoU7JV$9CkhiIIT5UOGfRK7vlLRtPBxfZM7IMxkSlkBwSPduldwj/VsKAKBzbHUlUPDEWkwBJfbZHSfFvXZNNMaoN7ym1' --name pi_password
+```
 
-Next we run another playbook that changes the default pi user password
-to something from this Ansible vault, and then adds me as a new user
-with sudo, adds me to all the standard pi groups and adds my public
-ssh key from GitHub so that I can log into this pi without ever having
-to enter the password again!
+This creates an encrypted variable in the Ansible vault called `pi_password`
+and is available in any playbook tasks that need it.  If this is the first
+variable that you have placed in the vault, you will be asked to provide a
+password (and a confirmation).
+
+Next we run another playbook that changes the default pi user password to
+something from this Ansible vault, and then adds me as a new user with sudo,
+adds me to all the standard pi groups and adds my public ssh key from GitHub so
+that I can log into this pi without ever having to enter the password again!
+
+Before running this playbook, make sure to check the file `group_vars/all.yml`
+as it will contain the variables for setting up the default user - obviously
+you should set this up to your own values.
 
 ```
-ansible-playbook -v -i ./hosts -u pi -k my-rpi.yml --ask-vault-pass --extra-vars '{"hostname":"zwischenwagen"}' 
-
+ansible-playbook -v -i [some-hostname|address}, -k my-rpi.yml --ask-vault-pass \
+                 --extra-vars '{"hostname":"some-hostname"}'
 ```
 
 # Next Steps

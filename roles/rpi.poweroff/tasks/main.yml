@@ -2,7 +2,14 @@
 ---
   - name: Poweroff if enabled
     become: yes
-    shell: "shutdown -h now"
+    shell: "shutdown -h +1"
     register: poweroff_status
     failed_when: "poweroff_status.rc not in [ 0 ]"
     when: (poweroff == True)
+
+  - name: Restart if enabled
+    become: yes
+    shell: "shutdown -r +1"
+    register: poweroff_status
+    failed_when: "poweroff_status.rc not in [ 0 ]"
+    when: (poweroff == False)

@@ -1,4 +1,4 @@
-- hosts: fresh_raspberrypi
+- hosts: all
   become: True
   become_method: sudo
   gather_facts: True
@@ -6,13 +6,18 @@
 # The vars section here should be set to reasonable defaults in the
 # corresponding hosts file
   vars:
-        ssh: True
-        wifi: True
-        poweroff: True
-        ansible_user: pi
+    ansible_user: pi
+    ssh: True
+    wifi: True
+    poweroff: False
 
   roles:
   - rpi.configure_ssh
   - rpi.configure_wifi
-  - rpi.configure_hostname
+
+  # Delay poweroff for one minute to allow hostname to change
+  #
+  # If poweroff is False then just restart - do not poweroff
+
   - rpi.poweroff
+  - rpi.configure_hostname
