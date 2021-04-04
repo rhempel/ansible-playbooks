@@ -83,6 +83,8 @@ and is available in any playbook tasks that need it.  If this is the first
 variable that you have placed in the vault, you will be asked to provide a
 password (and a confirmation).
 
+# Setting yourself up as an admin user on the Raspberry Pi
+
 Next we run another playbook that changes the default pi user password to
 something from this Ansible vault, and then adds me as a new user with sudo,
 adds me to all the standard pi groups and adds my public ssh key from GitHub so
@@ -99,7 +101,11 @@ ansible-playbook -v -i [some-hostname|address}, -k my-rpi.yml --ask-vault-pass \
 
 # Next Steps
 
-From this point forward, we can use Ansible playbooks without a lot of extra parameters
+From this point forward, we can use Ansible playbooks without a lot of extra
+variables because we have set our target device up with a known hostname
+and ouselves up as an admin user on that machine.
+
+arameters
 so let's get started with a few basic roles - roles are the way we can easily build up
 playbooks using known-good methods.
 

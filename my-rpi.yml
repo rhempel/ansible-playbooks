@@ -19,5 +19,5 @@
           39363434306562623834326465646136626661666437633364643132343263353266
 
   roles:
-  - pi.user_setup
+  - rpi.pi_user_setup
   - admin.user_setup
