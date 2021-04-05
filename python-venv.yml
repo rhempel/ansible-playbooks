@@ -1,0 +1,34 @@
+- hosts: rpi_python_virtualenv
+  become: True
+  become_method: sudo
+  become_user: "{{ admin_user }}"
+  gather_facts: True
+
+  vars:
+
+  roles:
+
+  tasks:
+  - name: Just let the world know this kind of works
+    block:
+    - command: echo "Hello World from {{ admin_user }} on {{ inventory_hostname }}"
+
+  - name: Install system level Python packages needed for virtual environments
+    become: True
+    apt:
+      pkg:
+      - python3-pip
+      - python3-venv
+
+# After running this play, you can set up and upgrade new virtual environments
+# by referring to this documentation:
+#
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/pip_module.html
+#
+# For example:
+#
+# - name: Set up a dummy virtualenv
+#   pip:
+#     name: pyserial
+#     virtualenv: ~/Projects/venv/dummy
+#     virtualenv_command: "python3 -m venv"

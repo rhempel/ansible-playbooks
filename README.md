@@ -99,21 +99,48 @@ ansible-playbook -v -i [some-hostname|address}, -k my-rpi.yml --ask-vault-pass \
                  --extra-vars '{"hostname":"some-hostname"}'
 ```
 
+# Manage your .ssh keys on the Raspberry Pi
+
+I use a `config` file in my `~/.ssh` directory to manage access to remote
+machines. See this article for details: https://stackoverflow.com/a/38454037
+
+We assume here that you have created a file on your local machine called
+`~/.ssh/ssh.tar.bz2` and that it's kept up to date. I keep the instructions
+for updating the file in `~/.ssh/config`.
+
+Now run the following playbook to copy and unpack the file in your `~/.ssh~`
+directory on the target machine:
+
+```
+ansible-playbook -v -i [some-hostname|address}, admin-ssh.yml
+```
+
 # Next Steps
 
 From this point forward, we can use Ansible playbooks without a lot of extra
 variables because we have set our target device up with a known hostname
 and ouselves up as an admin user on that machine.
 
-arameters
-so let's get started with a few basic roles - roles are the way we can easily build up
-playbooks using known-good methods.
+Let's get started with a few basic roles - roles are the way we can easily
+build up playbooks using known-good methods.
+
+From this point forward, we will also be using a local `hosts` file that
+will make our inventory of devices easier to manage. We can do this because
+we have given our device a unique hostname, so there is no need to supply
+an explicit hostname on the `ansible-playbook` command line. 
+
+## Set up the Raspberry Pi for Python vituralenv
+
+```
+ansible-playbook -v -i ./hosts  python-venv.yml
+```
+
+
+
+
 
 - Update to latest packages
 
-```
-ansible-playbook -v -i ./hosts rpi-jekyll.yml 
-```
 
 This playbook can take a loooong time to run as it updates the apt cache, installs a few
 bigger packages, and builds jekyll and the bundler. opens up prot 4000 etc...

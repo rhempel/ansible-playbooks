@@ -1,0 +1,47 @@
+- hosts: rpi_python_virtualenv
+  become: True
+  become_method: sudo
+  become_user: "{{ admin_user }}"
+  gather_facts: True
+
+  vars:
+
+  roles:
+
+  tasks:
+  - name: Install ssh keys and configuration
+    # Configuring ssh access for multiple sertvices is not difficult if
+    # we follow the advice in this StackOverflow post:
+    #
+    # https://stackoverflow.com/a/38454037
+    #
+    # It also highlights the need to read a few more answers to see if
+    # there are better answers besides the fist one ...
+
+    ansible.builtin.unarchive:
+      src: ~/.ssh/ssh.tar.bz2
+      dest: ~/.ssh
+
+  - name: Add GitHub fingerprint to known hosts
+    known_hosts:
+      name: github.com
+      key: github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+      path: ~/.ssh/known_hosts
+      hash_host: yes
+      state: present
+
+  - name: Add GitLab fingerprint to known hosts
+    known_hosts:
+      name: gitlab.com
+      key: gitlab.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFSMqzJeV9rUzU4kWitGjeR4PWSa29SPqJ1fVkhtj3Hw9xjLVXVYrU9QlYWrOLXBpQ6KWjbjTDTdDkoohFzgbEY=
+      path: ~/.ssh/known_hosts
+      hash_host: yes
+      state: present
+
+  - name: Add LEGO DTO GitLab fingerprint to known hosts
+    known_hosts:
+      name: gitlab.dto.lego.com
+      key: gitlab.dto.lego.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBGUyyAPm90FbWks/vqUIYQZT6HlzjLY/MjB5L09UrNMy6NZAjuHMapE8uiC8R9wnTMe3cWOVWSnCH7oDG6TKmhk=
+      path: ~/.ssh/known_hosts
+      hash_host: yes
+      state: present
