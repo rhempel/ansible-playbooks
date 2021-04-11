@@ -10,6 +10,9 @@ all:
     rpi_python_virtualenv:
       hosts:
         probewagen.local
+    rpi_lego_testframework:
+      hosts:
+        probewagen.local
     rpi_jekyll:
       hosts:
         zwischenwagen.local

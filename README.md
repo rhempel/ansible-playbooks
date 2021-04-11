@@ -132,8 +132,18 @@ an explicit hostname on the `ansible-playbook` command line.
 ## Set up the Raspberry Pi for Python vituralenv
 
 ```
-ansible-playbook -v -i ./hosts  python-venv.yml
+ansible-playbook -v -i ./hosts python-venv.yml
 ```
+
+## Set up the Raspberry Pi for LEGO Functional Test Framework
+
+Investigate how to keep the vault passwords locally and avoid passing
+the `--ask-vault-pass` option on the command line
+
+```
+ansible-playbook -v --ask-vault-pass -i ./hosts lego-testframework.yml
+```
+
 
 
 

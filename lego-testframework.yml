@@ -1,0 +1,76 @@
+- hosts: rpi_lego_testframework
+  become: True
+  become_method: sudo
+  become_user: "{{ admin_user }}"
+  gather_facts: True
+
+  vars:
+    lego_testframework_repo: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          61623430313935363134303461346164326663316433306635613732316363303139396631613132
+          3638623436333838383962646537353135613962303738390a636465633965343636333938343732
+          66323566396631623739363335383830303437636131663837333766323433376366643234623535
+          3761376165373565300a303065633133653962343661336130663332363466356537323031326561
+          64323164346536623539613833383233303635316463623836353361316462613430333463316437
+          66663930323161353165386431343539336332626664353539396432346434373437356237643834
+          31363131303637383061343335643866313466326565643065666134363866346564363764633133
+          32623066376639383131636534326661623463353763343262643961323863633461356430646662
+          6130
+
+    lego_test_suite: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          38343138613034313632633234316562373132373133653237643039316366353231663232336466
+          3863373534616361613136316530313364396431633230360a323234613963343038306634326265
+          61383938663065393335356138323737363938333264663061386530616236356635636631613633
+          6437376535366135340a373464663263613238653863653066666637646535316663333432313036
+          33343465623635393338613330633836363333326366383734616230303439363165
+
+  roles:
+
+  tasks:
+
+# May need to add some specific host keys to the known host list ...
+# ssh-keyscan -H remote_host.com >> /etc/ssh/ssh_known_hosts.
+
+  - name: Check if the lego_testframework_repo has been cloned already
+    ansible.builtin.git:
+      repo: "{{ lego_testframework_repo }}"
+      dest: "~/Projects/{{ lego_test_suite }}"
+      clone: no
+      update: no
+    register: repo_status 
+
+  - name: Clone the lego_test_framework if it's not in dest
+    ansible.builtin.git:
+      repo: "{{ lego_testframework_repo }}"
+      dest: "~/Projects/{{ lego_test_suite }}"
+      recursive: no
+    when: (repo_status.before == None)
+
+  - name: Update all submodules recursively - first time will take 10 minutes
+    ansible.builtin.git:
+      repo: "{{ lego_testframework_repo }}"
+      dest: "~/Projects/{{ lego_test_suite }}"
+      clone: no
+      update: yes
+      recursive: yes
+
+  - name: Add apt packages needed to build requirements
+    become: True
+    apt:
+      pkg:
+      - libffi-dev
+      - libssl-dev
+      - libjpeg-dev
+
+  - name: Set up a lego_testframework virtualenv with cython
+    pip:
+     name: cython, wheel
+     virtualenv: ~/Projects/venv/lego_testframework
+     virtualenv_command: "python3 -m venv"
+
+  - name: Add remaining requirements to lego_testframework virtualenv - first time will take 15 minutes
+    pip:
+     requirements: "~/Projects/{{ lego_test_suite }}/framework/requirements.txt"
+     virtualenv: ~/Projects/venv/lego_testframework
+     virtualenv_command: "python3 -m venv"
